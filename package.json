@@ -1,0 +1,51 @@
+{
+  "name": "new-package",
+  "version": "1.0.0",
+  "description": "A new package",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:ci": "vitest run --coverage",
+    "release:ci": "semantic-release --ci",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "maintainers": [
+    {
+      "name": "Mateusz Gostański",
+      "email": "mateusz.gostanski@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ArchiTower/new-package.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "prettier": "@architower/prettier-config",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.36.0",
+    "eslint-config-architower": "^1.0.0",
+    "prettier": "^2.8.6",
+    "@architower/prettier-config": "^1.0.0",
+    "lint-staged": "^13.2.0",
+    "@commitlint/cli": "^17.4.4",
+    "commitlint-config-gitmoji": "^2.3.1",
+    "gitmoji-cli": "^8.0.0",
+    "husky": "8.0.3",
+    "unbuild": "1.1.2",
+    "vitest": "^0.29.7",
+    "@vitest/coverage-istanbul": "^0.29.7",
+    "typescript": "5.0.2",
+    "semantic-release": "^20.1.1",
+    "semantic-release-config-gitmoji": "^1.4.3"
+  }
+}
