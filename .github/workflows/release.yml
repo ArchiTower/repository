@@ -33,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build project
+        run: pnpm run build:ci
+
       - name: Releasing
         run: pnpm release:ci
         env:
