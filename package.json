@@ -31,6 +31,9 @@
     }
   ],
   "license": "MIT",
+  "browserslist": [
+    "chrome > 87, firefox > 89, edge > 87, safari > 15.4, ios > 15.4, android > 87, ChromeAndroid > 87, FirefoxAndroid > 89"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:ArchiTower/repository.git"
@@ -58,6 +61,12 @@
     "semantic-release-config-gitmoji": "^1.4.3",
     "typescript": "5.0.4",
     "unbuild": "1.2.0",
-    "vitest": "^0.29.8"
+    "vitest": "^0.29.8",
+    "type-fest": "^3.7.1",
+    "jsdom": "^21.1.1",
+    "@faker-js/faker": "^7.6.0"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.0"
   }
 }
