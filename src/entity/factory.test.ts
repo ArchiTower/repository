@@ -125,12 +125,9 @@ describe("Entity", () => {
     })
 
     it("Given Entity, When updated, Then entity still has the same id", ({
-      faker,
+      fakeData,
       factory,
     }) => {
-      const fakeData = {
-        foo: faker.name.fullName(),
-      }
       const testEntity = factory(fakeData)
       const assignedId = testEntity.id
 

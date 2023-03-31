@@ -7,6 +7,10 @@ declare module "vitest" {
   export type TestEntityData = {
     foo: string
     bar: number
+    deep: {
+      foo: string
+      bar: string
+    }
     some: boolean
   }
 
@@ -24,6 +28,10 @@ beforeEach((context) => {
   context.fakeData = {
     foo: context.faker.name.fullName(),
     bar: context.faker.datatype.number(),
+    deep: {
+      foo: context.faker.name.firstName(),
+      bar: context.faker.name.lastName(),
+    },
     some: context.faker.datatype.boolean(),
   }
   context.fakeProto = {
