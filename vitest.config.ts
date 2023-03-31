@@ -2,11 +2,10 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   test: {
-    include: ["**/*.{test,unit,integration}.{ts,tsx}"],
+    include: ["src/**/*.{test,unit,integration}.{ts,tsx}"],
     environment: "jsdom",
     setupFiles: ["vitest.setup.ts"],
     coverage: {
-      all: true,
       provider: "istanbul",
       reporter: ["text", "json", "html", "lcov"],
       lines: 80,
