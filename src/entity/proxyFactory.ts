@@ -6,6 +6,7 @@
 import type { Entity, EntityInternal, EntityPrototype } from "./interface"
 import { generateId } from "./adapters/generateId"
 import { SyncKey, SyncMap } from "./sync"
+import { readonlyClone } from "./deepReadonly"
 
 export function makeInternalEntity<
   TSchema extends Record<string, any>,
@@ -19,7 +20,7 @@ export function makeInternalEntity<
   return {
     ...proto,
     id: id ?? generateId(),
-    _data: structuredClone(data),
+    _data: readonlyClone(data),
     _syncMap: new SyncMap(syncDestinations),
     _proto: proto,
   }

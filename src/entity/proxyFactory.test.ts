@@ -8,10 +8,12 @@ import {
 } from "vitest"
 import { makeInternalEntity, makeEntityProxy } from "./proxyFactory"
 import { Entity, EntityInternal } from "./interface"
+import { DeepReadonly } from "./types"
 
 declare module "vitest" {
   export interface TestContext {
     fakeInternalEntity: EntityInternal<TestEntityData, TestEntityData>
+    entityProxy: Entity<TestEntityData, TestEntityData>
   }
 }
 
@@ -58,14 +60,13 @@ describe("EntityProxy", () => {
       context.fakeData,
       context.syncKeys
     )
+    context.entityProxy = makeEntityProxy(context.fakeInternalEntity)
   })
 
   it("Given EntityInternal, When EntityProxy created, Then return EntityProxy", ({
-    fakeInternalEntity: internalEntity,
     fakeData,
+    entityProxy: entity,
   }) => {
-    const entity = makeEntityProxy(internalEntity)
-
     expect(entity).toBeTypeOf("object")
     expectTypeOf(entity).toMatchTypeOf<
       Entity<TestEntityData, typeof fakeData>
@@ -74,20 +75,25 @@ describe("EntityProxy", () => {
 
   it("Given EntityInternal, When EntityProxy created, Then EntityProxy is immutable", ({
     fakeInternalEntity: internalEntity,
+    entityProxy: entity,
   }) => {
-    const entity = makeEntityProxy(internalEntity)
-
+    expectTypeOf(entity).toMatchTypeOf<
+      DeepReadonly<typeof internalEntity._data>
+    >()
     expect(() => {
       // @ts-expect-error - checking immutability in runtime
       entity.foo = "test"
+    }).toThrow()
+    expect(() => {
+      // @ts-expect-error - checking immutability in runtime
+      entity.deep.foo = "test"
     }).toThrow()
   })
 
   it("Given EntityInternal, When EntityProxy created, Then EntityProxy has only data keys", ({
     fakeInternalEntity: internalEntity,
+    entityProxy: entity,
   }) => {
-    const entity = makeEntityProxy(internalEntity)
-
     expect(Reflect.ownKeys(entity)).toStrictEqual(
       Reflect.ownKeys(internalEntity._data)
     )
@@ -103,5 +109,14 @@ describe("EntityProxy", () => {
     expect(Object.getPrototypeOf(entityOne)).toStrictEqual(
       Object.getPrototypeOf(entityTwo)
     )
+  })
+
+  it("Given EntityInternal, When EntityProxy created, Then EntityProxy restrict access to SyncMap", ({
+    entityProxy: entity,
+  }) => {
+    expect(() => {
+      // @ts-expect-error - checking in runtime
+      entity._syncMap
+    }).toThrow()
   })
 })

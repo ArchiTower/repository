@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ReadonlyDeep } from "type-fest"
-import { SyncDestination, SyncMap, SyncKey } from "./sync"
+import { SyncMap, SyncKey } from "./sync"
+import type { DeepReadonly } from "./types"
 
 export type EntityData = Record<string, any>
 
@@ -20,7 +20,7 @@ export type Entity<
   TSchema extends Record<string, any>,
   TData extends Partial<TSchema>
 > = { readonly id: string } & EntityPrototype<TSchema, TData> &
-  ReadonlyDeep<TData>
+  DeepReadonly<TData>
 
 export type EntityInternal<
   TSchema extends Record<string, any>,
@@ -28,7 +28,7 @@ export type EntityInternal<
 > = {
   readonly id: string
   _proto: EntityPrototype<TSchema, TData>
-  _data: TData
+  _data: DeepReadonly<TData>
   _syncMap: SyncMap
 }
 
