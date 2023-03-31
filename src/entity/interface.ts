@@ -11,9 +11,8 @@ export type EntityPrototype<
 > = {
   update(data: Partial<TSchema>): Entity<TSchema, TData>
   toObject(): TData & { id: string }
-  // toJSON(): string
   isSynced(id: SyncKey): boolean
-  // setSynced(id: SyncDestination["id"]): void
+  setSynced(id: SyncKey, promise: Promise<unknown>): void
 }
 
 export type Entity<

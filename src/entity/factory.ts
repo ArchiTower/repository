@@ -32,6 +32,14 @@ export function makeEntityFactory<TSchema extends EntityData>(
     ): boolean {
       return this._syncMap.checkStatus(id)
     },
+
+    setSynced<TInput extends Partial<TSchema>>(
+      this: EntityInternal<TSchema, TInput>,
+      id: SyncKey,
+      promise: Promise<unknown>
+    ): void {
+      this._syncMap.setStatus(id, promise)
+    },
   }
 
   function createEntity<
