@@ -1,14 +1,29 @@
-import { ReadonlyDeep } from "type-fest"
+/* eslint-disable sonarjs/prefer-single-boolean-return */
+import { DeepReadonly } from "./types"
+
+function validateCustomTypes<TValue>(value: TValue): boolean {
+  const excludedTypes = [Date, RegExp, Map, Set]
+  return !excludedTypes.some((type) => value instanceof type)
+}
 
 export function deepReadonly<TWriteableObject extends Record<string, any>>(
   obj: TWriteableObject
-): ReadonlyDeep<TWriteableObject> {
+): DeepReadonly<TWriteableObject> {
   Reflect.ownKeys(obj).forEach((key) => {
     const value = obj[key as keyof TWriteableObject]
-    if (value && typeof value === "object" && !(value instanceof Date)) {
+    if (value && typeof value === "object" && validateCustomTypes(value)) {
+      // @ts-expect-error - we know that value is object
       obj[key as keyof TWriteableObject] = deepReadonly(value)
     }
   })
 
-  return Object.freeze(obj) as ReadonlyDeep<TWriteableObject>
+  return Object.freeze(obj) as DeepReadonly<TWriteableObject>
+}
+
+export function readonlyClone<TData extends Record<string, any>>(
+  data: TData
+): DeepReadonly<TData> {
+  const clonedData = structuredClone(data)
+
+  return deepReadonly(clonedData)
 }
