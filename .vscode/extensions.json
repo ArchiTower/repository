@@ -1,6 +1,8 @@
 {
   "recommendations": [
     "seatonjiang.gitmoji-vscode",
-    "zixuanchen.vitest-explorer"
+    "zixuanchen.vitest-explorer",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
   ]
 }
