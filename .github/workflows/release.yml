@@ -18,10 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Init pnpm
+      - name: Init pnpm (latest)
         uses: pnpm/action-setup@v2
         with:
-          version: 6.32.9
+          version: latest
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
