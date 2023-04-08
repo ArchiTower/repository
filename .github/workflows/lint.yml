@@ -2,11 +2,11 @@ name: ESLint
 
 on:
   push:
-    branches: [ "develop", main ]
+    branches: ["develop", main]
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
   schedule:
-    - cron: '44 9 * * 4'
+    - cron: "44 9 * * 4"
 
 jobs:
   eslint:
@@ -37,11 +37,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+        run:
+          # prettier-ignore
+          pnpm exec eslint . --config .eslintrc.js --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
