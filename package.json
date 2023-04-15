@@ -57,7 +57,7 @@
     "semantic-release": "^21.0.1",
     "semantic-release-config-gitmoji": "^1.4.3",
     "typescript": "5.0.4",
-    "unbuild": "1.2.0",
+    "unbuild": "1.2.1",
     "vitest": "^0.29.8"
   }
 }
