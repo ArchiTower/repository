@@ -44,7 +44,7 @@
   "prettier": "@architower/prettier-config",
   "devDependencies": {
     "@architower/prettier-config": "^1.0.0",
-    "@commitlint/cli": "^17.5.1",
+    "@commitlint/cli": "^17.6.1",
     "@microsoft/eslint-formatter-sarif": "2.1.7",
     "@vitest/coverage-istanbul": "^0.29.8",
     "commitlint-config-gitmoji": "^2.3.1",
