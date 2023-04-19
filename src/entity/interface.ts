@@ -36,16 +36,13 @@ export type EntityInternal<
   _syncMap: SyncMap
 }
 
-export interface EntityFactory<
-  TSchema extends Record<string, any>,
-  TDefinitions
-> {
-  createEntity<TInput extends Partial<TSchema>>(
+export type EntityFactory<TSchema extends Record<string, any>, TDefinitions> = {
+  createEntity: <TInput extends Partial<TSchema> = Partial<TSchema>>(
     data: TInput
-  ): Entity<TSchema, TInput, TDefinitions>
-  recoverEntity<TInput extends Partial<TSchema>>(
+  ) => Entity<TSchema, TInput, TDefinitions>
+  recoverEntity: <TInput extends Partial<TSchema>>(
     data: TInput & { id: string }
-  ): Entity<TSchema, TInput, TDefinitions>
+  ) => Entity<TSchema, TInput, TDefinitions>
 }
 
 export interface Relationship<
