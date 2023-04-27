@@ -35,7 +35,7 @@
     /* Ensure that casing is correct in imports. */
     "forceConsistentCasingInFileNames": true,
     /* Type Checking */
-    "strict": true, /* Enable all strict type-checking options. */
+    "strict": true /* Enable all strict type-checking options. */,
     /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     // "noImplicitAny": true,
     /* When type checking, take into account 'null' and 'undefined'. */
@@ -43,7 +43,5 @@
     /* Skip type checking all .d.ts files. */
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["**/*.ts"]
 }
