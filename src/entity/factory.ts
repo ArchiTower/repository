@@ -54,8 +54,9 @@ export function makeEntityFactory<TSchema extends EntityData>() {
     }
 
     definitions.forEach((definition: (typeof definitions)[number]) => {
+      // @ts-expect-error -- TS doesn't see index type
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       proto[definition.id] = () => {
-        console.log("Call to foreign repository", definition.foreignRepository)
         // TODO: Add implementation for reaching out to RepositoryManager
 
         return {}
