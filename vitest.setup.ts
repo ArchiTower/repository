@@ -34,6 +34,7 @@ beforeEach((context) => {
   }
 })
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function generateFakeObj(faker: Faker) {
   return {
     foo: faker.name.fullName(),

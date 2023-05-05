@@ -1,4 +1,10 @@
-import { EntityData, Entity, EntityFactory, EntityInternal, EntityPrototype } from "./interface"
+import {
+  EntityData,
+  Entity,
+  EntityFactory,
+  EntityInternal,
+  EntityPrototype,
+} from "./interface"
 import { SyncKey } from "./sync"
 import { makeInternalEntity, makeEntityProxy } from "./proxyFactory"
 
