@@ -1,17 +1,18 @@
-name: ESLint
+name: Lint
 
 on:
   push:
-    branches: ["develop", main]
+    branches: ["develop", "main"]
   pull_request:
     branches: ["develop"]
-  schedule:
-    - cron: "44 9 * * 4"
 
 jobs:
-  eslint:
-    name: Run eslint scanning
+  lint:
+    name: Run linters
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.12.1]
     permissions:
       contents: read
       security-events: write
@@ -26,15 +27,18 @@ jobs:
         with:
           version: latest
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js (v${{ matrix.node-version }})
         uses: actions/setup-node@v3
         with:
-          node-version: 18.12.1
+          node-version: ${{ matrix.node-version }}
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Type-checking
+        run: pnpm run type-check
 
       - name: Run ESLint
         run:
