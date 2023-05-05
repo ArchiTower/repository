@@ -7,7 +7,7 @@ export default defineConfig({
     setupFiles: ["vitest.setup.ts"],
     coverage: {
       provider: "istanbul",
-      reporter: ["text", "json", "html", "lcov"],
+      reporter: ["text", "json", "json-summary", "html", "lcov"],
       lines: 80,
       statements: 80,
       functions: 80,

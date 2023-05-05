@@ -11,10 +11,17 @@ permissions:
 
 jobs:
   release:
+    name: Releasing
+
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [18.12.1]
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -23,10 +30,10 @@ jobs:
         with:
           version: latest
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js (v${{ matrix.node-version }})
         uses: actions/setup-node@v3
         with:
-          node-version: 18.12.1
+          node-version: ${{ matrix.node-version }}
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
 
