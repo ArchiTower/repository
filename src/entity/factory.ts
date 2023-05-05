@@ -1,4 +1,4 @@
-import { EntityData, Entity, EntityFactory, EntityInternal } from "./interface"
+import { EntityData, Entity, EntityFactory, EntityInternal, EntityPrototype } from "./interface"
 import { SyncKey } from "./sync"
 import { makeInternalEntity, makeEntityProxy } from "./proxyFactory"
 
@@ -12,7 +12,7 @@ export function makeEntityFactory<TSchema extends EntityData>(
     ): Entity<TSchema, TInput> {
       return makeEntityProxy(
         makeInternalEntity<TSchema, TInput>(
-          proto,
+          proto as EntityPrototype<TSchema, TInput>,
           { ...this._data, ...data },
           syncDestinations,
           this.id
@@ -46,7 +46,11 @@ export function makeEntityFactory<TSchema extends EntityData>(
     const TInput extends Partial<TSchema> = Partial<TSchema>
   >(data: TInput): Entity<TSchema, TInput> {
     return makeEntityProxy(
-      makeInternalEntity<TSchema, TInput>(proto, data, syncDestinations)
+      makeInternalEntity<TSchema, TInput>(
+        proto as EntityPrototype<TSchema, TInput>,
+        data,
+        syncDestinations
+      )
     )
   }
 
@@ -57,7 +61,7 @@ export function makeEntityFactory<TSchema extends EntityData>(
 
     return makeEntityProxy(
       makeInternalEntity<TSchema, TInput>(
-        proto,
+        proto as EntityPrototype<TSchema, TInput>,
         data,
         syncDestinations,
         data.id

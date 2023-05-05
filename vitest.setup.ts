@@ -1,5 +1,5 @@
 import { beforeEach, vi } from "vitest"
-import { faker } from "@faker-js/faker"
+import { Faker, faker } from "@faker-js/faker"
 import { SyncKey, SyncMap } from "src/entity/sync"
 import { EntityPrototype } from "src/entity/interface"
 
@@ -16,7 +16,7 @@ declare module "vitest" {
 
   export interface TestContext {
     faker: typeof faker
-    fakeData: TestEntityData
+    fakeData: ReturnType<typeof generateFakeObj>
     syncKeys: SyncKey[]
     fakeProto: EntityPrototype<TestEntityData, this["fakeData"]>
   }
@@ -25,18 +25,23 @@ declare module "vitest" {
 beforeEach((context) => {
   context.faker = faker
   context.syncKeys = [SyncMap.makeSyncKey("test")]
-  context.fakeData = {
-    foo: context.faker.name.fullName(),
-    bar: context.faker.datatype.number(),
-    deep: {
-      foo: context.faker.name.firstName(),
-      bar: context.faker.name.lastName(),
-    },
-    some: context.faker.datatype.boolean(),
-  }
+  context.fakeData = generateFakeObj(context.faker)
   context.fakeProto = {
     update: vi.fn(),
     toObject: vi.fn(),
     isSynced: vi.fn(),
+    setSynced: vi.fn(),
   }
 })
+
+function generateFakeObj(faker: Faker) {
+  return {
+    foo: faker.name.fullName(),
+    bar: faker.datatype.number(),
+    deep: {
+      foo: faker.name.firstName(),
+      bar: faker.name.lastName(),
+    },
+    some: faker.datatype.boolean(),
+  }
+}
