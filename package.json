@@ -71,6 +71,7 @@
     "unbuild": "1.2.1"
   },
   "dependencies": {
-    "@paralleldrive/cuid2": "2.2.0"
+    "@paralleldrive/cuid2": "2.2.0",
+    "just-omit": "^2.2.0"
   }
 }
