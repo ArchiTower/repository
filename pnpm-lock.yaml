@@ -8,6 +8,9 @@ dependencies:
   '@paralleldrive/cuid2':
     specifier: 2.2.0
     version: 2.2.0
+  just-omit:
+    specifier: ^2.2.0
+    version: 2.2.0
 
 devDependencies:
   '@architower/prettier-config':
@@ -5198,6 +5201,10 @@ packages:
       array-includes: 3.1.6
       object.assign: 4.1.4
     dev: true
+
+  /just-omit@2.2.0:
+    resolution: {integrity: sha512-Js7+HxDOGcB3RhI38Mird/RgyMf3t0DAJFda1QWqqlAKTa36NeSYIufJXxrZUbysFTRcTOFcoMCiFK5FwCoI7Q==}
+    dev: false
 
   /keyv@4.5.2:
     resolution: {integrity: sha512-5MHbFaKn8cNSmVW7BYnijeAVlE4cYA/SVkifVgrh7yotnfhKmjuXpDKjrABLnT0SfHWV21P8ow07OGfRrNDg8g==}
