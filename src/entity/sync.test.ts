@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, expectTypeOf } from "vitest"
-import { SyncMap, SyncKey } from "./sync"
+import { SyncKey } from "./interface"
+import { SyncMap, makeSyncKey } from "./sync"
 
 declare module "vitest" {
   export interface TestContext {
@@ -9,12 +10,12 @@ declare module "vitest" {
 
 describe("SyncMap", () => {
   beforeEach((context) => {
-    context.syncMapDestinationId = SyncMap.makeSyncKey("destination-id")
+    context.syncMapDestinationId = makeSyncKey("destination-id")
   })
 
   describe("SyncKey", () => {
-    it("Given string, When SyncMap.makeSyncKey is called, Then return SyncKey", () => {
-      const syncKey = SyncMap.makeSyncKey("test")
+    it("Given string, When makeSyncKey is called, Then return SyncKey", () => {
+      const syncKey = makeSyncKey("test")
 
       expect(syncKey).toBe("test")
       expectTypeOf(syncKey).toMatchTypeOf<SyncKey>()
@@ -29,10 +30,18 @@ describe("SyncMap", () => {
     expect(syncMap.checkStatus(destinationId)).toBe(false)
   })
 
+  it("Given two the same destination IDs, When SyncMap is created, Then SyncMap has one destination", ({
+    syncMapDestinationId: destinationId,
+  }) => {
+    const syncMap = new SyncMap([destinationId, destinationId])
+
+    expect(syncMap.checkStatus(destinationId)).toBe(false)
+  })
+
   it("Given couple destination IDs, When SyncMap is created, Then SyncMap has many destinations", ({
     syncMapDestinationId: firstDestinationId,
   }) => {
-    const secondDestinationId = SyncMap.makeSyncKey("other-destination-id")
+    const secondDestinationId = makeSyncKey("other-destination-id")
 
     const syncMap = new SyncMap([firstDestinationId, secondDestinationId])
 

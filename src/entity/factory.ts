@@ -1,93 +1,86 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
+  EntitySchema,
+  Relationship,
+  UserDefinedSchema,
+  SyncKey,
+  ProxyTarget,
+  AllowedEntityInput,
   EntityData,
   Entity,
-  EntityInternal,
-  Relationship,
   EntityPrototype,
 } from "./interface"
-import { SyncKey } from "./sync"
-import { makeInternalEntity, makeEntityProxy } from "./proxyFactory"
-import { RepositoryKey } from "src/repositoryKey"
+import { relationAccessorFactory } from "./relationsAccessor"
+import { createInternalEntity } from "./proto"
+import { proxyHandlerFactory } from "./proxyHandlerFactory"
+import { generateId } from "./generateId"
 
-export function makeEntityFactory<TSchema extends EntityData>() {
-  return <const TDefinition = Relationship<TSchema, RepositoryKey<any, any>>>(
-    definitions: TDefinition[],
-    syncDestinations: SyncKey[] = []
+export function entityModelFactory<TInputSchema extends UserDefinedSchema>() {
+  type ModelSchema = EntitySchema<TInputSchema>
+
+  return <
+    const TDefinition extends Relationship<ModelSchema> = Relationship<ModelSchema>
+  >(
+    definitions: TDefinition[] = [],
+    syncKeys: SyncKey[] = []
   ) => {
-    type Definitions = (typeof definitions)[number]
+    const relationAccessor =
+      definitions.length > 0 ? relationAccessorFactory(definitions) : {}
 
-    const proto = {
-      update<const TInput extends Partial<TSchema>>(
-        this: EntityInternal<TSchema, TInput, Definitions>,
-        data: TInput
-      ): Entity<TSchema, TInput, Definitions> {
-        return makeEntityProxy(
-          makeInternalEntity<TSchema, TInput, Definitions>(
-            proto as EntityPrototype<TSchema, TInput, Definitions>,
-            { ...this._data, ...data },
-            syncDestinations,
-            this.id
-          )
-        )
-      },
+    const internalEntityClass = createInternalEntity<ModelSchema>(syncKeys)
 
-      toObject<TInput extends Partial<TSchema>>(
-        this: EntityInternal<TSchema, TInput, Definitions>
-      ) {
-        return Object.assign({}, this._data)
-      },
+    const proxyHandler = proxyHandlerFactory<ProxyTarget>(updateEntity)
 
-      isSynced<TInput extends Partial<TSchema>>(
-        this: EntityInternal<TSchema, TInput, Definitions>,
-        id: SyncKey
-      ): boolean {
-        return this._syncMap.checkStatus(id)
-      },
+    function updateEntity<TUpdatedData extends AllowedEntityInput<ModelSchema>>(
+      this: { proto: EntityPrototype<ModelSchema, EntityData<ModelSchema>> },
+      updatedData: TUpdatedData
+    ): any {
+      const updatedInternalEntity = this.proto.update(updatedData)
 
-      setSynced<TInput extends Partial<TSchema>>(
-        this: EntityInternal<TSchema, TInput, Definitions>,
-        id: SyncKey,
-        promise: Promise<unknown>
-      ): void {
-        this._syncMap.setStatus(id, promise)
-      },
+      const proxyTarget = createProxyTarget(updatedInternalEntity)
+
+      return new Proxy(proxyTarget, proxyHandler)
     }
 
-    definitions.forEach((definition: (typeof definitions)[number]) => {
-      // @ts-expect-error -- TS doesn't see index type
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      proto[definition.id] = () => {
-        // TODO: Add implementation for reaching out to RepositoryManager
-
-        return {}
+    function createProxyTarget<TInternalEntity>(
+      internalEntity: TInternalEntity
+    ) {
+      return {
+        proto: internalEntity,
+        relationAccessor: relationAccessor,
       }
-    })
-
-    function createEntity<
-      const TInput extends Partial<TSchema> = Partial<TSchema>
-    >(data: TInput): Entity<TSchema, TInput, Definitions> {
-      return makeEntityProxy(
-        makeInternalEntity<TSchema, TInput, Definitions>(
-          proto as EntityPrototype<TSchema, TInput, Definitions>,
-          data,
-          syncDestinations
-        )
-      )
     }
 
-    function recoverEntity<const TInput extends Partial<TSchema>>(
-      data: TInput & { id: string }
-    ): Entity<TSchema, TInput, Definitions> {
-      if (!data.id) throw new Error("Entity must have an id")
+    function createEntity<TInputData extends AllowedEntityInput<ModelSchema>>(
+      inputData: TInputData
+    ) {
+      const id = generateId()
+      const data = { ...inputData, id } satisfies EntityData<TInputData>
 
-      return makeEntityProxy(
-        makeInternalEntity<TSchema, TInput, Definitions>(
-          proto as EntityPrototype<TSchema, TInput, Definitions>,
-          data,
-          syncDestinations,
-          data.id
-        )
-      )
+      const internalEntity = new internalEntityClass(data)
+
+      const proxyTarget = createProxyTarget(internalEntity)
+
+      return new Proxy(proxyTarget, proxyHandler) as unknown as Entity<
+        ModelSchema,
+        typeof data,
+        typeof definitions
+      >
+    }
+
+    function recoverEntity(serializedData: string) {
+      const data = JSON.parse(serializedData) as EntityData<
+        AllowedEntityInput<ModelSchema>
+      >
+      const internalEntity = new internalEntityClass(data)
+
+      const proxyTarget = createProxyTarget(internalEntity)
+
+      return new Proxy(proxyTarget, proxyHandler) as unknown as Entity<
+        ModelSchema,
+        typeof data,
+        typeof definitions
+      >
     }
 
     return {
