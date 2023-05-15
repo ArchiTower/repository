@@ -51,4 +51,35 @@ describe("proto", () => {
       DeepReadonly<{ foo: string; bar: number; id: string; some: boolean }>
     >()
   })
+
+  it("isSynced method return status for given SyncKey", ({ syncKeys }) => {
+    const context = createInternalEntity<TestEntityData>(syncKeys)
+
+    const entity = new context({
+      id: "1",
+      foo: "foo",
+      bar: 1,
+    })
+
+    expect(entity.isSynced(syncKeys[0])).toBe(false)
+    expect(entity.isSynced(syncKeys[1])).toBe(false)
+  })
+
+  it("setSynced method set status for given SyncKey", async ({ syncKeys }) => {
+    const context = createInternalEntity<TestEntityData>(syncKeys)
+
+    const entity = new context({
+      id: "1",
+      foo: "foo",
+      bar: 1,
+    })
+
+    const promise = Promise.resolve()
+
+    entity.setSynced(syncKeys[0], promise)
+    await promise
+
+    expect(entity.isSynced(syncKeys[0])).toBe(true)
+    expect(entity.isSynced(syncKeys[1])).toBe(false)
+  })
 })
