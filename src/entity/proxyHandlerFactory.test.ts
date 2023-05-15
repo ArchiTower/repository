@@ -177,7 +177,28 @@ describe("proxyHandlerFactory", () => {
     }).toThrowError("You can't change entity prototype.")
   })
 
-  // TODO: Add test for iterator & object spreading
-  // TODO: Add test for accessing proto & relationAccessor directly
-  // TODO: Add test for accessing unexsiting key
+  it("Given proxy with handler, When iterate over proxy, Then iterate over internal data object", ({
+    testProxy,
+  }) => {
+    const keys = []
+    for (const key in testProxy) {
+      keys.push(key)
+    }
+    expect(keys).toEqual(["fakeKey"])
+  })
+
+  it("Given proxy with handler, When spread proxy, Then spread internal data object", ({
+    testProxy,
+  }) => {
+    const spreaded = { ...testProxy }
+    expect(spreaded).toEqual({ fakeKey: "fakeValue" })
+  })
+
+  it("Given proxy with handler, When access non-existing key, Then throw error", ({
+    testProxy,
+  }) => {
+    expect(() => {
+      const value = testProxy.nonExistingKey
+    }).toThrowError("Property 'nonExistingKey' does not exist on this entity.")
+  })
 })

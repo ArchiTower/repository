@@ -6,6 +6,20 @@
 
 import { ProxyTarget } from "./interface"
 
+const allowedSymbolKeys = new Set([
+  Symbol.hasInstance,
+  Symbol.isConcatSpreadable,
+  Symbol.iterator,
+  Symbol.toStringTag,
+])
+
+const allowedInternalMethods = new Set([
+  "toJson",
+  "toObject",
+  "isSynced",
+  "setSynced",
+])
+
 export function proxyHandlerFactory<TProxied extends ProxyTarget>(
   updateEntityFn: (data: any) => any
 ): ProxyHandler<TProxied> {
@@ -15,15 +29,17 @@ export function proxyHandlerFactory<TProxied extends ProxyTarget>(
         return {}
       }
 
+      if (prop in target.proto.data || allowedSymbolKeys.has(prop as symbol)) {
+        return Reflect.get(target.proto.data, prop, receiver)
+      }
+
       if (prop === "update") {
         return function (...args: any) {
           return updateEntityFn.apply(target, args)
         }
       }
 
-      if (
-        ["toJson", "toObject", "isSynced", "setSynced"].includes(prop as string)
-      ) {
+      if (allowedInternalMethods.has(prop as string)) {
         return function (...args: any[]) {
           return target.proto[prop].apply(
             // @ts-expect-error -- proxy handler
@@ -37,7 +53,9 @@ export function proxyHandlerFactory<TProxied extends ProxyTarget>(
         return target.relationAccessor[prop]
       }
 
-      return Reflect.get(target.proto.data, prop, receiver)
+      throw new Error(
+        `Property '${prop.toString()}' does not exist on this entity.`
+      )
     },
     set() {
       throw new Error(
