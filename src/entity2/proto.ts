@@ -35,6 +35,7 @@ export function createInternalEntity<TSchema extends EntitySchema>(
       return new EntityInternal<TActualData & TUpdatedData>({
         ...(this._data as TActualData),
         ...data,
+        id: this._data.id,
       })
     }
 
