@@ -1,6 +1,18 @@
-import { describe, it, beforeEach, expect, expectTypeOf } from "vitest"
+import {
+  describe,
+  it,
+  beforeEach,
+  expect,
+  expectTypeOf,
+  PostsRelationDefinition,
+} from "vitest"
 import { makeEntityFactory } from "./factory"
-import { Entity, EntityFactory } from "./interface"
+import {
+  Entity,
+  EntityFactory,
+  FindForeignSchemaInDefinitions,
+} from "./interface"
+import { makeRepositoryKey } from "src/repositoryKey"
 
 type TestEntityData = {
   foo: string
@@ -10,14 +22,37 @@ type TestEntityData = {
 
 declare module "vitest" {
   export interface TestContext {
-    factory: EntityFactory<TestEntityData>["createEntity"]
-    recover: EntityFactory<TestEntityData>["recoverEntity"]
+    factory: EntityFactory<
+      TestEntityData,
+      PostsRelationDefinition
+    >["createEntity"]
+    recover: EntityFactory<
+      TestEntityData,
+      PostsRelationDefinition
+    >["recoverEntity"]
   }
 }
 
 describe("Entity", () => {
   beforeEach((context) => {
-    const { createEntity, recoverEntity } = makeEntityFactory<TestEntityData>(
+    const fakeRepoKey = makeRepositoryKey<
+      {
+        id: string
+        name: string
+        authorId: string
+      },
+      "posts"
+    >("posts")
+    const { createEntity, recoverEntity } = makeEntityFactory<TestEntityData>()(
+      [
+        {
+          id: "posts",
+          type: "has-many",
+          foreignRepository: fakeRepoKey,
+          foreignKey: "authorId",
+          localKey: "foo",
+        },
+      ],
       context.syncKeys
     )
     context.factory = createEntity
@@ -33,7 +68,7 @@ describe("Entity", () => {
 
       expect(testEntity.foo).toBe(fakeData.foo)
       expectTypeOf(testEntity).toMatchTypeOf<
-        Entity<TestEntityData, typeof fakeData>
+        Entity<TestEntityData, typeof fakeData, PostsRelationDefinition>
       >()
     })
 
@@ -97,7 +132,7 @@ describe("Entity", () => {
       expect(testEntity.bar).toBe(fakeData.bar)
       expect(testEntity.some).toBe(fakeData.some)
       expectTypeOf(testEntity).toMatchTypeOf<
-        Entity<TestEntityData, typeof fakeData>
+        Entity<TestEntityData, typeof fakeData, PostsRelationDefinition>
       >()
     })
 
@@ -146,6 +181,17 @@ describe("Entity", () => {
 
       expect(obj).toMatchObject(fakeData)
       expect(Object.getPrototypeOf(obj)).toMatchObject({})
+    })
+
+    it("Given Entity with relationship, when relationship accessor called, return related entity", ({
+      factory,
+      fakeData,
+    }) => {
+      const testEntity = factory(fakeData)
+
+      expectTypeOf(testEntity.posts()).toEqualTypeOf<
+        FindForeignSchemaInDefinitions<PostsRelationDefinition, "posts">
+      >
     })
   })
 })

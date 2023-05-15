@@ -10,13 +10,14 @@ import { readonlyClone } from "./deepReadonly"
 
 export function makeInternalEntity<
   TSchema extends Record<string, any>,
-  TData extends Partial<TSchema>
+  TData extends Partial<TSchema>,
+  TDefinitions
 >(
-  proto: EntityPrototype<TSchema, TData>,
+  proto: EntityPrototype<TSchema, TData, TDefinitions>,
   data: TData,
   syncDestinations: SyncKey[],
   id?: string
-): EntityInternal<TSchema, TData> {
+): EntityInternal<TSchema, TData, TDefinitions> {
   return {
     ...proto,
     id: id ?? generateId(),
@@ -28,8 +29,11 @@ export function makeInternalEntity<
 
 export function makeEntityProxy<
   TSchema extends Record<string, any>,
-  TData extends Partial<TSchema>
->(internalEntity: EntityInternal<TSchema, TData>): Entity<TSchema, TData> {
+  TData extends Partial<TSchema>,
+  TDefinitions
+>(
+  internalEntity: EntityInternal<TSchema, TData, TDefinitions>
+): Entity<TSchema, TData, TDefinitions> {
   return new Proxy(internalEntity, {
     get(target, prop, receiver) {
       if (prop === "id") {
@@ -72,5 +76,5 @@ export function makeEntityProxy<
     getPrototypeOf(target) {
       return Object.getPrototypeOf(target._proto)
     },
-  }) as unknown as Entity<TSchema, TData>
+  }) as unknown as Entity<TSchema, TData, TDefinitions>
 }

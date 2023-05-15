@@ -128,6 +128,16 @@ packages:
       - supports-color
     dev: true
 
+  /@babel/code-frame@7.18.6:
+    resolution:
+      {
+        integrity: sha512-TDCmlK5eOvH+eH7cdAFlNXeVJqWIQ7gW9tY1GJIpUtFb6CmjVyq2VM3u71bOyR8CRihcCgMUYoDNyLXao3+70Q==,
+      }
+    engines: { node: ">=6.9.0" }
+    dependencies:
+      "@babel/highlight": 7.18.6
+    dev: true
+
   /@babel/code-frame@7.21.4:
     resolution: {integrity: sha512-LYvhNKfwWSPpocw8GI7gpK2nq3HSDuEPC/uSYaALSJu9xjsalaaYFOq0Pwt5KmVqwEbZlDu81aLXwBOmD/Fv9g==}
     engines: {node: '>=6.9.0'}

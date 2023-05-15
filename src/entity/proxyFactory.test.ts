@@ -5,6 +5,7 @@ import {
   expectTypeOf,
   beforeEach,
   TestEntityData,
+  PostsRelationDefinition,
 } from "vitest"
 import { makeInternalEntity, makeEntityProxy } from "./proxyFactory"
 import { Entity, EntityInternal } from "./interface"
@@ -12,8 +13,12 @@ import { DeepReadonly } from "./types"
 
 declare module "vitest" {
   export interface TestContext {
-    fakeInternalEntity: EntityInternal<TestEntityData, TestEntityData>
-    entityProxy: Entity<TestEntityData, TestEntityData>
+    fakeInternalEntity: EntityInternal<
+      TestEntityData,
+      TestEntityData,
+      PostsRelationDefinition
+    >
+    entityProxy: Entity<TestEntityData, TestEntityData, PostsRelationDefinition>
   }
 }
 
@@ -27,7 +32,7 @@ describe("Internal Entity", () => {
 
     expect(result).toBeTypeOf("object")
     expectTypeOf(result).toMatchTypeOf<
-      EntityInternal<TestEntityData, typeof fakeData>
+      EntityInternal<TestEntityData, typeof fakeData, PostsRelationDefinition>
     >()
   })
 
@@ -69,7 +74,7 @@ describe("EntityProxy", () => {
   }) => {
     expect(entity).toBeTypeOf("object")
     expectTypeOf(entity).toMatchTypeOf<
-      Entity<TestEntityData, typeof fakeData>
+      Entity<TestEntityData, typeof fakeData, PostsRelationDefinition>
     >()
   })
 
