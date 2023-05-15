@@ -1,36 +1,42 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-type ProxiedObj = {
-  proto: any
-  relationAccessor: any
-}
+import { ProxyTarget } from "./interface"
 
-export function proxyHandlerFactory<
-  TProxied extends ProxiedObj
->(): ProxyHandler<TProxied> {
+export function proxyHandlerFactory<TProxied extends ProxyTarget>(
+  updateEntityFn: (data: any) => any
+): ProxyHandler<TProxied> {
   return {
     get(target, prop, receiver) {
       if (prop === "data") {
         return {}
       }
+
+      if (prop === "update") {
+        return function (...args: any) {
+          return updateEntityFn.apply(target, args)
+        }
+      }
+
       if (
-        typeof prop === "string" &&
-        ["update", "toJson", "toObject", "isSynced", "setSynced"].includes(prop)
+        ["toJson", "toObject", "isSynced", "setSynced"].includes(prop as string)
       ) {
         return function (...args: any[]) {
           return target.proto[prop].apply(
             // @ts-expect-error -- proxy handler
-            this === receiver ? target : this,
+            this === receiver ? target.proto : this,
             args
           )
         }
       }
+
       if (prop in target.relationAccessor) {
         return target.relationAccessor[prop]
       }
+
       return Reflect.get(target.proto.data, prop, receiver)
     },
     set() {
@@ -47,7 +53,6 @@ export function proxyHandlerFactory<
     getOwnPropertyDescriptor(target, prop) {
       if (prop in target.proto.data) {
         return {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           value: target.proto.data[prop],
           writable: false,
           enumerable: true,
