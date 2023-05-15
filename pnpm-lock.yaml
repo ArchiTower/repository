@@ -7074,7 +7074,10 @@ packages:
     dev: true
 
   /just-omit@2.2.0:
-    resolution: {integrity: sha512-Js7+HxDOGcB3RhI38Mird/RgyMf3t0DAJFda1QWqqlAKTa36NeSYIufJXxrZUbysFTRcTOFcoMCiFK5FwCoI7Q==}
+    resolution:
+      {
+        integrity: sha512-Js7+HxDOGcB3RhI38Mird/RgyMf3t0DAJFda1QWqqlAKTa36NeSYIufJXxrZUbysFTRcTOFcoMCiFK5FwCoI7Q==,
+      }
     dev: false
 
   /keyv@4.5.2:
