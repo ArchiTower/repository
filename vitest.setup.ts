@@ -1,9 +1,8 @@
-import { beforeEach, vi } from "vitest"
+import { beforeEach } from "vitest"
 import { Faker, faker } from "@faker-js/faker"
-import { SyncKey } from "src/entity/sync"
-import { EntityPrototype } from "src/entity/interface"
 import type { RepositoryKey } from "src/repositoryKey"
 import { makeSyncKey } from "src/entity2/sync"
+import { SyncKey } from "src/entity2/interface"
 
 declare module "vitest" {
   export type TestRawEntityData = {
@@ -77,11 +76,7 @@ declare module "vitest" {
       },
       "authors"
     >
-    fakeProto: EntityPrototype<
-      TestEntityData,
-      this["fakeData"],
-      PostsRelationDefinition
-    >
+    serializedEntity: string
   }
 }
 
@@ -89,13 +84,6 @@ beforeEach((context) => {
   context.faker = faker
   context.syncKeys = [makeSyncKey("test")]
   context.fakeData = generateFakeObj(context.faker)
-  context.fakeProto = {
-    update: vi.fn(),
-    toObject: vi.fn(),
-    isSynced: vi.fn(),
-    setSynced: vi.fn(),
-    posts: vi.fn(),
-  }
 })
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
