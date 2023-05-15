@@ -55,6 +55,31 @@ describe("Deep Readonly", () => {
       readonlyObj.map.set("test", "test")
     }).not.toThrow()
   })
+
+  it("Given object already frozen, When deepReadonly is called, Then return object has proper DeepReadonly object", () => {
+    const obj = deepReadonly({
+      foo: "bar",
+      bar: {
+        foo: "bar",
+      },
+    })
+
+    const readonlyObj = deepReadonly(obj)
+
+    // It must be the same object, mutation not copy
+    expect(readonlyObj).toBe(obj)
+    expect(readonlyObj.bar).toBe(obj.bar)
+    expectTypeOf(readonlyObj).toMatchTypeOf<ReadonlyDeep<typeof obj>>()
+    // Double check for runtime
+    expect(() => {
+      // @ts-expect-error - we testing what TS know in runtime
+      readonlyObj.foo = "baz"
+    }).toThrow()
+    expect(() => {
+      // @ts-expect-error - we testing what TS know in runtime
+      readonlyObj.bar.foo = "baz"
+    }).toThrow()
+  })
 })
 
 describe("Deep Readonly Clone", () => {

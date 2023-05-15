@@ -11,7 +11,12 @@ export function deepReadonly<TWriteableObject extends Record<string, any>>(
 ): DeepReadonly<TWriteableObject> {
   Reflect.ownKeys(obj).forEach((key) => {
     const value = obj[key as keyof TWriteableObject]
-    if (value && typeof value === "object" && validateCustomTypes(value)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      validateCustomTypes(value) &&
+      Object.isFrozen(value) === false
+    ) {
       // @ts-expect-error - we know that value is object
       obj[key as keyof TWriteableObject] = deepReadonly(value)
     }
