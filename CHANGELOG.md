@@ -1,5 +1,22 @@
 # Changelog
 
+# [1.0.0-beta.2](https://github.com/ArchiTower/repository/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2023-05-15)
+
+
+### ✨ Features
+
+* create PoC of Relations ([bdc599a](https://github.com/ArchiTower/repository/commit/bdc599a)), closes [#6](https://github.com/ArchiTower/repository/issues/6)
+
+
+### 🎫 Chores
+
+* **deps**: Update all non-major dependencies ([0f6fc98](https://github.com/ArchiTower/repository/commit/0f6fc98))
+
+
+### 🔧 Continuous Integration
+
+* optimize pipelines ([d7647e4](https://github.com/ArchiTower/repository/commit/d7647e4)), closes [#16](https://github.com/ArchiTower/repository/issues/16)
+
 # 1.0.0-beta.1 (2023-04-27)
 
 
