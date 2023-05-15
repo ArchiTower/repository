@@ -46,9 +46,17 @@ describe("proto", () => {
       id: "1",
       some: true,
     })
-    // @ts-expect-error -- testing types
     expectTypeOf(result.toObject()).toEqualTypeOf<
-      DeepReadonly<{ foo: string; bar: number; id: string; some: boolean }>
+      DeepReadonly<
+        {
+          id: string
+          foo: string
+          bar: number
+        } & {
+          foo: string
+          some: true
+        }
+      >
     >()
   })
 

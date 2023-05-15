@@ -34,16 +34,18 @@ declare module "vitest" {
     readonly localKey: "foo"
   }
 
+  export type AuthorsRepositoryKey = RepositoryKey<
+    {
+      id: string
+      name: string
+    },
+    "authors"
+  >
+
   export type AuthorRelationDefinition = {
     readonly id: "author"
     readonly type: "belongs-to"
-    readonly foreignRepository: RepositoryKey<
-      {
-        id: number
-        name: string
-      },
-      "authors"
-    >
+    readonly foreignRepository: AuthorsRepositoryKey
     readonly foreignKey: "id"
     readonly localKey: "bar"
   }
@@ -76,6 +78,7 @@ declare module "vitest" {
       },
       "authors"
     >
+    authorsRelationship: AuthorRelationDefinition
     serializedEntity: string
   }
 }

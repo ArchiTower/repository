@@ -44,14 +44,14 @@ describe("proxyHandlerFactory", () => {
         return this._mockedRelationAccessor()
       },
     }
-    const proxyHandler = proxyHandlerFactory<typeof ctx.fakeProxiedObj>()
+    const proxyHandler = proxyHandlerFactory<typeof ctx.fakeProxiedObj>(vi.fn())
     ctx.testProxy = new Proxy(ctx.fakeProxiedObj, proxyHandler) as any
   })
 
   it("When factory called, Then return proxy handler with traps", ({
     fakeProxiedObj,
   }) => {
-    const proxyHandler = proxyHandlerFactory<typeof fakeProxiedObj>()
+    const proxyHandler = proxyHandlerFactory<typeof fakeProxiedObj>(vi.fn())
 
     expect(proxyHandler).toEqual({
       get: expect.any(Function),

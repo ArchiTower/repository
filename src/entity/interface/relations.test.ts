@@ -50,7 +50,7 @@ describe("Interface: Relations", () => {
         authorId: string
       }[]
       author: () => {
-        id: number
+        id: string
         name: string
       }
     }>()

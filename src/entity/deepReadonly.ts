@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/prefer-single-boolean-return */
 import { DeepReadonly } from "./types"
 
 function validateCustomTypes<TValue>(value: TValue): boolean {

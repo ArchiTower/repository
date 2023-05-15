@@ -15,8 +15,7 @@ describe("interface", () => {
     type Test = Entity<
       TestEntityData,
       EntityData<typeof fakeData>,
-      [PostsRelationDefinition],
-      []
+      [PostsRelationDefinition]
     >
 
     expectTypeOf<Test["posts"]>().toEqualTypeOf<
