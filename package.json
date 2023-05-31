@@ -68,7 +68,7 @@
     "vitest": "0.31.3",
     "type-fest": "3.11.1",
     "jsdom": "22.1.0",
-    "@faker-js/faker": "7.6.0"
+    "@faker-js/faker": "8.0.2"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "2.2.0"
