@@ -92,11 +92,11 @@ beforeEach((context) => {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function generateFakeObj(faker: Faker) {
   return {
-    foo: faker.name.fullName(),
-    bar: faker.datatype.number(),
+    foo: faker.person.fullName(),
+    bar: faker.number.int(),
     deep: {
-      foo: faker.name.firstName(),
-      bar: faker.name.lastName(),
+      foo: faker.person.firstName(),
+      bar: faker.person.lastName(),
     },
     some: faker.datatype.boolean(),
   }
