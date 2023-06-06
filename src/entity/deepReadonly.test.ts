@@ -19,11 +19,11 @@ describe("Deep Readonly", () => {
     expectTypeOf(readonlyObj).toMatchTypeOf<ReadonlyDeep<typeof obj>>()
     // Double check for runtime
     expect(() => {
-      // @ts-expect-error - we testing what TS know in runtime
+      // @ts-expect-error - we testing runtime
       readonlyObj.foo = "baz"
     }).toThrow()
     expect(() => {
-      // @ts-expect-error - we testing what TS know in runtime
+      // @ts-expect-error - we testing runtime
       readonlyObj.bar.foo = "baz"
     }).toThrow()
   })
@@ -55,6 +55,29 @@ describe("Deep Readonly", () => {
       readonlyObj.map.set("test", "test")
     }).not.toThrow()
   })
+
+  it("Given object already frozen, When deepReadonly is called, Then return object has proper DeepReadonly object", () => {
+    const obj = deepReadonly({
+      foo: "bar",
+      bar: {
+        foo: "bar",
+      },
+    })
+
+    const readonlyObj = deepReadonly(obj)
+
+    expect(readonlyObj).toBe(obj)
+    expect(readonlyObj.bar).toBe(obj.bar)
+    expectTypeOf(readonlyObj).toMatchTypeOf<ReadonlyDeep<typeof obj>>()
+    expect(() => {
+      // @ts-expect-error - we testing runtime
+      readonlyObj.foo = "baz"
+    }).toThrow()
+    expect(() => {
+      // @ts-expect-error - we testing runtime
+      readonlyObj.bar.foo = "baz"
+    }).toThrow()
+  })
 })
 
 describe("Deep Readonly Clone", () => {
@@ -68,17 +91,15 @@ describe("Deep Readonly Clone", () => {
 
     const readonlyObj = readonlyClone(obj)
 
-    // It must be the same object, mutation not copy
     expect(readonlyObj).not.toBe(obj)
     expect(readonlyObj.bar).not.toBe(obj.bar)
     expectTypeOf(readonlyObj).toMatchTypeOf<ReadonlyDeep<typeof obj>>()
-    // Double check for runtime
     expect(() => {
-      // @ts-expect-error - we testing what TS know in runtime
+      // @ts-expect-error - we testing runtime
       readonlyObj.foo = "baz"
     }).toThrow()
     expect(() => {
-      // @ts-expect-error - we testing what TS know in runtime
+      // @ts-expect-error - we testing runtime
       readonlyObj.bar.foo = "baz"
     }).toThrow()
   })

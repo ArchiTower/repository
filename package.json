@@ -62,13 +62,13 @@
     "prettier": "2.8.8",
     "semantic-release": "21.0.2",
     "semantic-release-config-gitmoji": "1.5.0",
-    "typescript": "5.0.4",
-    "@total-typescript/ts-reset": "0.4.2",
-    "unbuild": "1.2.1",
     "vitest": "0.31.3",
     "type-fest": "3.11.1",
     "jsdom": "22.1.0",
-    "@faker-js/faker": "8.0.2"
+    "@faker-js/faker": "8.0.2",
+    "typescript": "5.0.4",
+    "@total-typescript/ts-reset": "0.4.2",
+    "unbuild": "1.2.1"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "2.2.0"

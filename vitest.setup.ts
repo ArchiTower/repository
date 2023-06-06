@@ -1,11 +1,11 @@
-import { beforeEach, vi } from "vitest"
+import { beforeEach } from "vitest"
 import { Faker, faker } from "@faker-js/faker"
-import { SyncKey, SyncMap } from "src/entity/sync"
-import { EntityPrototype } from "src/entity/interface"
 import type { RepositoryKey } from "src/repositoryKey"
+import { makeSyncKey } from "src/entity/sync"
+import { SyncKey } from "src/entity/interface"
 
 declare module "vitest" {
-  export type TestEntityData = {
+  export type TestRawEntityData = {
     foo: string
     bar: number
     deep: {
@@ -13,6 +13,10 @@ declare module "vitest" {
       bar: string
     }
     some: boolean
+  }
+
+  export type TestEntityData = TestRawEntityData & {
+    id: string
   }
 
   export type PostsRelationDefinition = {
@@ -30,10 +34,27 @@ declare module "vitest" {
     readonly localKey: "foo"
   }
 
+  export type AuthorsRepositoryKey = RepositoryKey<
+    {
+      id: string
+      name: string
+    },
+    "authors"
+  >
+
+  export type AuthorRelationDefinition = {
+    readonly id: "author"
+    readonly type: "belongs-to"
+    readonly foreignRepository: AuthorsRepositoryKey
+    readonly foreignKey: "id"
+    readonly localKey: "bar"
+  }
+
   export interface TestContext {
     faker: typeof faker
     fakeData: ReturnType<typeof generateFakeObj>
     syncKeys: SyncKey[]
+    // TODO: Delete it after refactoring
     foreignRepositoryKey: RepositoryKey<
       {
         id: string
@@ -42,35 +63,40 @@ declare module "vitest" {
       },
       "posts"
     >
-    fakeProto: EntityPrototype<
-      TestEntityData,
-      this["fakeData"],
-      PostsRelationDefinition
+    postsRepositoryKey: RepositoryKey<
+      {
+        id: string
+        name: string
+        authorId: string
+      },
+      "posts"
     >
+    authorsRepositoryKey: RepositoryKey<
+      {
+        id: string
+        name: string
+      },
+      "authors"
+    >
+    authorsRelationship: AuthorRelationDefinition
+    serializedEntity: string
   }
 }
 
 beforeEach((context) => {
   context.faker = faker
-  context.syncKeys = [SyncMap.makeSyncKey("test")]
+  context.syncKeys = [makeSyncKey("test")]
   context.fakeData = generateFakeObj(context.faker)
-  context.fakeProto = {
-    update: vi.fn(),
-    toObject: vi.fn(),
-    isSynced: vi.fn(),
-    setSynced: vi.fn(),
-    posts: vi.fn(),
-  }
 })
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function generateFakeObj(faker: Faker) {
   return {
-    foo: faker.name.fullName(),
-    bar: faker.datatype.number(),
+    foo: faker.person.fullName(),
+    bar: faker.number.int(),
     deep: {
-      foo: faker.name.firstName(),
-      bar: faker.name.lastName(),
+      foo: faker.person.firstName(),
+      bar: faker.person.lastName(),
     },
     some: faker.datatype.boolean(),
   }

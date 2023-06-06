@@ -1,197 +1,320 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   describe,
   it,
-  beforeEach,
   expect,
+  TestRawEntityData,
+  beforeEach,
   expectTypeOf,
-  PostsRelationDefinition,
 } from "vitest"
-import { makeEntityFactory } from "./factory"
-import {
-  Entity,
-  EntityFactory,
-  FindForeignSchemaInDefinitions,
-} from "./interface"
+import { entityModelFactory } from "./factory"
 import { makeRepositoryKey } from "src/repositoryKey"
-
-type TestEntityData = {
-  foo: string
-  bar: number
-  some: boolean
-}
-
-declare module "vitest" {
-  export interface TestContext {
-    factory: EntityFactory<
-      TestEntityData,
-      PostsRelationDefinition
-    >["createEntity"]
-    recover: EntityFactory<
-      TestEntityData,
-      PostsRelationDefinition
-    >["recoverEntity"]
-  }
-}
+import { makeSyncKey } from "./sync"
 
 describe("Entity", () => {
   beforeEach((context) => {
-    const fakeRepoKey = makeRepositoryKey<
+    context.authorsRepositoryKey = makeRepositoryKey<
       {
         id: string
         name: string
-        authorId: string
       },
-      "posts"
-    >("posts")
-    const { createEntity, recoverEntity } = makeEntityFactory<TestEntityData>()(
-      [
-        {
-          id: "posts",
-          type: "has-many",
-          foreignRepository: fakeRepoKey,
-          foreignKey: "authorId",
-          localKey: "foo",
-        },
-      ],
-      context.syncKeys
-    )
-    context.factory = createEntity
-    context.recover = recoverEntity
+      "authors"
+    >("authors")
+    context.authorsRelationship = {
+      id: "author",
+      type: "belongs-to",
+      foreignRepository: context.authorsRepositoryKey,
+      foreignKey: "id",
+      localKey: "bar",
+    }
+    context.serializedEntity = JSON.stringify({
+      id: "super-unique-id",
+      foo: "bar",
+    })
   })
 
-  describe("createEntity", () => {
-    it("Given data, When created entity, Then return new Entity with given data", ({
-      fakeData,
-      factory,
-    }) => {
-      const testEntity = factory(fakeData)
+  describe("Factories", () => {
+    describe("Model Factory", () => {
+      it("Given schema, When model factory called, Then return context factory", () => {
+        const result = entityModelFactory<TestRawEntityData>()
 
-      expect(testEntity.foo).toBe(fakeData.foo)
-      expectTypeOf(testEntity).toMatchTypeOf<
-        Entity<TestEntityData, typeof fakeData, PostsRelationDefinition>
+        expect(result).toBeInstanceOf(Function)
+      })
+    })
+
+    describe("Context Factory", () => {
+      it("Given schema, relations, sync keys, When context factory called, Then return entity factories", ({
+        syncKeys,
+        authorsRelationship,
+      }) => {
+        const result = entityModelFactory<TestRawEntityData>()(
+          [authorsRelationship],
+          syncKeys
+        )
+
+        expect(result).toEqual(
+          expect.objectContaining({
+            createEntity: expect.any(Function),
+            recoverEntity: expect.any(Function),
+          })
+        )
+      })
+
+      it("Given schema, relations, When context factory called, Then return entity factories", ({
+        authorsRelationship,
+      }) => {
+        const result = entityModelFactory<TestRawEntityData>()([
+          authorsRelationship,
+        ])
+
+        expect(result).toEqual(
+          expect.objectContaining({
+            createEntity: expect.any(Function),
+            recoverEntity: expect.any(Function),
+          })
+        )
+      })
+
+      it("Given schema, When context factory called, Then return entity factories", () => {
+        const result = entityModelFactory<TestRawEntityData>()()
+
+        expect(result).toEqual(
+          expect.objectContaining({
+            createEntity: expect.any(Function),
+            recoverEntity: expect.any(Function),
+          })
+        )
+      })
+    })
+
+    describe("Entity Factory", () => {
+      it("Given schema, When entity factory called, Then return entity with given data", () => {
+        const entityFactory = entityModelFactory<TestRawEntityData>()()
+
+        const data = {
+          foo: "bar",
+        }
+
+        const entity = entityFactory.createEntity(data)
+
+        expect(entity).toEqual(
+          expect.objectContaining({
+            foo: "bar",
+          })
+        )
+      })
+
+      it("Given schema, When entity factory called, Then return entity with unique identifier", () => {
+        const entityFactory = entityModelFactory<TestRawEntityData>()()
+
+        const data = {
+          foo: "bar",
+        }
+
+        const entity = entityFactory.createEntity(data)
+
+        expect(entity.id).toBeDefined()
+      })
+
+      it("Given schema, relations, When entity factory called, Then return entity with relations", ({
+        authorsRelationship,
+      }) => {
+        const entityFactory = entityModelFactory<TestRawEntityData>()([
+          authorsRelationship,
+        ])
+        const data = {
+          foo: "bar",
+        }
+
+        const entity = entityFactory.createEntity(data)
+
+        expect(entity.author).toBeDefined()
+        expect(entity.author).toBeTypeOf("function")
+      })
+
+      it("Given schema, sync keys, When entity factory called, Then return entity with sync keys", () => {
+        const firstSyncKey = makeSyncKey("foo")
+        const entityFactory = entityModelFactory<TestRawEntityData>()(
+          [],
+          [firstSyncKey]
+        )
+        const data = {
+          foo: "bar",
+        }
+
+        const entity = entityFactory.createEntity(data)
+
+        expect(entity.isSynced(firstSyncKey)).toBe(false)
+      })
+    })
+
+    describe("Recover Entity", () => {
+      it("Given serialized entity, When recover entity, Then return entity with given data, And the same ID", ({
+        serializedEntity,
+      }) => {
+        const entityFactory = entityModelFactory<TestRawEntityData>()()
+
+        const recoveredEntity = entityFactory.recoverEntity(serializedEntity)
+
+        expect(recoveredEntity).toEqual(
+          expect.objectContaining({
+            id: "super-unique-id",
+            foo: "bar",
+          })
+        )
+      })
+
+      it("Given serialized entity, When recover entity, Then return entity with relations", ({
+        authorsRelationship,
+        serializedEntity,
+      }) => {
+        const entityFactory = entityModelFactory<TestRawEntityData>()([
+          authorsRelationship,
+        ])
+
+        const recoveredEntity = entityFactory.recoverEntity(serializedEntity)
+
+        expect(recoveredEntity.author).toBeDefined()
+        expect(recoveredEntity.author).toBeTypeOf("function")
+      })
+
+      it("Given serialized entity, When recover entity, Then return entity with sync keys all set to un-up-to-date", ({
+        serializedEntity,
+      }) => {
+        const firstSyncKey = makeSyncKey("foo")
+        const entityFactory = entityModelFactory<TestRawEntityData>()(
+          [],
+          [firstSyncKey]
+        )
+
+        const recoveredEntity = entityFactory.recoverEntity(serializedEntity)
+
+        expect(recoveredEntity.isSynced(firstSyncKey)).toBe(false)
+      })
+    })
+  })
+
+  describe("Instance", () => {
+    it("Given entity, When update, Then update data, And set sync status to un-up-to-date, And keep the same ID, And create new object, And keeps relations untouched", async ({
+      authorsRelationship,
+    }) => {
+      const firstSyncKey = makeSyncKey("foo")
+      const secondSyncKey = makeSyncKey("bar")
+      const { createEntity } = entityModelFactory<TestRawEntityData>()(
+        [authorsRelationship],
+        [firstSyncKey, secondSyncKey]
+      )
+      const entity = createEntity({
+        foo: "bar",
+      })
+      const testPromise = Promise.resolve()
+      entity.setSynced(firstSyncKey, testPromise)
+      await testPromise
+      expect(entity.isSynced(firstSyncKey)).toBe(true)
+
+      const updatedEntity = entity.update({
+        foo: "baz",
+        some: false,
+      })
+
+      expect(updatedEntity).not.toBe(entity)
+      expect(updatedEntity.id).toBe(entity.id)
+      expect(updatedEntity.foo).toBe("baz")
+      expect(updatedEntity.some).toBe(false)
+
+      expect(updatedEntity.isSynced(firstSyncKey)).toBe(false)
+      expect(updatedEntity.isSynced(secondSyncKey)).toBe(false)
+
+      expect(updatedEntity.author).toBeDefined()
+      expectTypeOf(updatedEntity.author).toEqualTypeOf<
+        () => { id: string; name: string }
       >()
+      expect(updatedEntity.author).toBeTypeOf("function")
     })
 
-    it("Given Entity, When created, Then entity has id", ({
-      faker,
-      factory,
-    }) => {
-      const fakeData = {
-        foo: faker.name.fullName(),
+    it("Given entity, When update to add data properties, Then updated entity have both data properties", () => {
+      const { createEntity } = entityModelFactory<TestRawEntityData>()()
+      const entity = createEntity({
+        foo: "bar",
+      })
+
+      const updatedEntity = entity.update({
+        some: false,
+      })
+
+      expect(updatedEntity).not.toBe(entity)
+      expect(updatedEntity.foo).toBe("bar")
+      expect(updatedEntity.some).toBe(false)
+    })
+
+    it("Given entity, When update with id, Then ID is not updated", () => {
+      const { createEntity } = entityModelFactory<TestRawEntityData>()()
+      const entity = createEntity({
+        foo: "bar",
+      })
+
+      const updatedEntity = entity.update({
+        // @ts-expect-error - intentionally testing invalid update
+        id: "some-id",
+      })
+
+      expect(updatedEntity).not.toBe(entity)
+      expect(updatedEntity.id).toBe(entity.id)
+      expect(updatedEntity.id).not.toBe("some-id")
+    })
+
+    it("Given entity, When serialize, Then return serialized entity", () => {
+      const { createEntity } = entityModelFactory<TestRawEntityData>()()
+      const data = {
+        foo: "bar",
       }
+      const entity = createEntity(data)
 
-      const testEntity = factory(fakeData)
+      const serializedEntity = entity.toJson()
 
-      expect(testEntity.id).toBeDefined()
-      expectTypeOf(testEntity.id).toMatchTypeOf<string>()
+      expect(JSON.parse(serializedEntity)).toEqual({
+        ...data,
+        id: entity.id,
+      })
     })
 
-    it("Given Entity, When created, Then entity is immutable", ({
-      faker,
-      factory,
-    }) => {
-      const fakeData = {
-        foo: faker.name.fullName(),
+    it("Given entity, When dumping to regular object, Then return regular object with data", () => {
+      const { createEntity } = entityModelFactory<TestRawEntityData>()()
+      const data = {
+        foo: "bar",
       }
+      const entity = createEntity(data)
 
-      const testEntity = factory(fakeData)
+      const dumpedObject = entity.toObject()
 
-      expect(() => {
-        // @ts-expect-error - we testing what TS know in runtime
-        testEntity.foo = "Updated"
-      }).toThrow()
+      expect(dumpedObject).toEqual({
+        ...data,
+        id: entity.id,
+      })
     })
 
-    it("Given entity & SyncKey, When created, Then has sync map initialized", ({
-      fakeData,
-      factory,
-      syncKeys,
-    }) => {
-      const entity = factory(fakeData)
-
-      expect(entity.isSynced(syncKeys[0])).toBe(false)
-    })
-  })
-
-  describe("recoverEntity", () => {
-    it("Given data, When recovering entity, Then return new Entity with given data & id", ({
-      faker,
-      recover,
-    }) => {
-      const fakeData = {
-        id: faker.datatype.uuid(),
-        foo: faker.name.fullName(),
-        bar: faker.datatype.number(),
-        some: faker.datatype.boolean(),
+    it("Given entity, When setSynced, Then update sync status only", async () => {
+      const firstSyncKey = makeSyncKey("foo")
+      const secondSyncKey = makeSyncKey("bar")
+      const entityFactory = entityModelFactory<TestRawEntityData>()(
+        [],
+        [firstSyncKey, secondSyncKey]
+      )
+      const data = {
+        foo: "bar",
       }
-      const testEntity = recover(fakeData)
+      const entity = entityFactory.createEntity(data)
+      expect(entity.isSynced(firstSyncKey)).toBe(false)
+      expect(entity.isSynced(secondSyncKey)).toBe(false)
+      const id = entity.id
 
-      expect(testEntity.id).toBeDefined()
-      expect(testEntity.id).toBe(fakeData.id)
-      expect(testEntity.foo).toBe(fakeData.foo)
-      expect(testEntity.bar).toBe(fakeData.bar)
-      expect(testEntity.some).toBe(fakeData.some)
-      expectTypeOf(testEntity).toMatchTypeOf<
-        Entity<TestEntityData, typeof fakeData, PostsRelationDefinition>
-      >()
-    })
+      const fakePromise = Promise.resolve()
+      entity.setSynced(firstSyncKey, fakePromise)
+      await fakePromise
 
-    it("Given data without ID, when recovering entity, Then throw error", ({
-      recover,
-      fakeData,
-    }) => {
-      // @ts-expect-error - we testing what TS know in runtime
-      expect(() => recover(fakeData)).toThrow()
-    })
-  })
-
-  describe("Entity prototype", () => {
-    it("Given Entity, When updated, Then return new Entity with updated data", ({
-      fakeData,
-      factory,
-    }) => {
-      const testEntity = factory(fakeData)
-      expect(testEntity.foo).not.toEqual("Updated")
-
-      const updatedEntity = testEntity.update({ foo: "Updated" })
-
-      expect(updatedEntity.foo).toEqual("Updated")
-      expect(updatedEntity.bar).toEqual(testEntity.bar)
-    })
-
-    it("Given Entity, When updated, Then entity still has the same id", ({
-      fakeData,
-      factory,
-    }) => {
-      const testEntity = factory(fakeData)
-      const assignedId = testEntity.id
-
-      const updatedEntity = testEntity.update({ foo: "Updated" })
-
-      expect(updatedEntity.id).toEqual(assignedId)
-    })
-
-    it("Given Entity, When toObject() called, Then return object with data but without prototype", ({
-      factory,
-      fakeData,
-    }) => {
-      const testEntity = factory(fakeData)
-
-      const obj = testEntity.toObject()
-
-      expect(obj).toMatchObject(fakeData)
-      expect(Object.getPrototypeOf(obj)).toMatchObject({})
-    })
-
-    it("Given Entity with relationship, when relationship accessor called, return related entity", ({
-      factory,
-      fakeData,
-    }) => {
-      const testEntity = factory(fakeData)
-
-      expectTypeOf(testEntity.posts()).toEqualTypeOf<
-        FindForeignSchemaInDefinitions<PostsRelationDefinition, "posts">
-      >
+      expect(entity.isSynced(firstSyncKey)).toBe(true)
+      expect(entity.isSynced(secondSyncKey)).toBe(false)
+      expect(entity.id).toBe(id)
     })
   })
 })
