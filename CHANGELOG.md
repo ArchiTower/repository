@@ -1,5 +1,38 @@
 # Changelog
 
+# [1.0.0-beta.3](https://github.com/ArchiTower/repository/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2023-06-08)
+
+
+### ♻ Code Refactoring
+
+* relationships & entities ([5da28b7](https://github.com/ArchiTower/repository/commit/5da28b7)), closes [#18](https://github.com/ArchiTower/repository/issues/18)
+
+
+### 🎫 Chores
+
+* add ts-reset ([e8159c5](https://github.com/ArchiTower/repository/commit/e8159c5))
+* **deps**: Update all non-major dependencies ([d2a4dda](https://github.com/ArchiTower/repository/commit/d2a4dda)), closes [#21](https://github.com/ArchiTower/repository/issues/21)
+* **deps**: Update all non-major dependencies ([2317a9f](https://github.com/ArchiTower/repository/commit/2317a9f))
+* **deps**: Update devDependency @faker-js/faker to v8 ([187d7d8](https://github.com/ArchiTower/repository/commit/187d7d8)), closes [#17](https://github.com/ArchiTower/repository/issues/17)
+* **deps**: Update devDependency @microsoft/eslint-formatter-sarif to v3 ([117a564](https://github.com/ArchiTower/repository/commit/117a564)), closes [#13](https://github.com/ArchiTower/repository/issues/13)
+* **deps**: Update devDependency type-fest to v3 ([2c5721e](https://github.com/ArchiTower/repository/commit/2c5721e)), closes [#20](https://github.com/ArchiTower/repository/issues/20)
+
+
+### 🐛 Bug Fixes
+
+* exclude docs from linting ([1d27ccd](https://github.com/ArchiTower/repository/commit/1d27ccd))
+
+
+### 📝 Documentation
+
+* init ([e831548](https://github.com/ArchiTower/repository/commit/e831548)), closes [#19](https://github.com/ArchiTower/repository/issues/19)
+
+
+### 🔧 Continuous Integration
+
+* add manual triggering CI actions ([d9a9091](https://github.com/ArchiTower/repository/commit/d9a9091))
+* fix commitlint config ([2051c04](https://github.com/ArchiTower/repository/commit/2051c04))
+
 # [1.0.0-beta.2](https://github.com/ArchiTower/repository/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2023-05-15)
 
 ### ✨ Features
