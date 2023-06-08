@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { makeRepositoryKey } from "src/repositoryKey"
+import { makeRepositoryKey } from "@/repositoryKey"
 import { describe, it, expect, expectTypeOf, beforeEach } from "vitest"
 import { relationAccessorFactory } from "./relationsAccessor"
 import { Relations } from "./interface"
