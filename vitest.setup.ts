@@ -1,8 +1,8 @@
 import { beforeEach } from "vitest"
 import { Faker, faker } from "@faker-js/faker"
-import type { RepositoryKey } from "src/repositoryKey"
-import { makeSyncKey } from "src/entity/sync"
-import { SyncKey } from "src/entity/interface"
+import type { RepositoryKey } from "@/repositoryKey"
+import { makeSyncKey } from "@/entity/sync"
+import { SyncKey } from "@/entity/interface"
 
 declare module "vitest" {
   export type TestRawEntityData = {

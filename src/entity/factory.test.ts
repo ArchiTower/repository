@@ -8,7 +8,7 @@ import {
   expectTypeOf,
 } from "vitest"
 import { entityModelFactory } from "./factory"
-import { makeRepositoryKey } from "src/repositoryKey"
+import { makeRepositoryKey } from "@/repositoryKey"
 import { makeSyncKey } from "./sync"
 
 describe("Entity", () => {

@@ -2,6 +2,9 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   test: {
+    alias: {
+      "@": "./src",
+    },
     include: ["src/**/*.{test,unit,integration}.{ts,tsx}"],
     environment: "jsdom",
     setupFiles: ["vitest.setup.ts"],
