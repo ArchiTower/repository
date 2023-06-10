@@ -44,10 +44,40 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build project
-        run: pnpm run build:ci
+        run: pnpm run build
 
-      - name: Releasing
-        run: pnpm release:ci
+      - name: Creating .npmrc
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          EOF
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Show branch name
+        run: echo ${{ github.ref }}
+
+      - name: Publish to npm
+        id: changesets-main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: changesets/action@v1
+        with:
+          version: pnpm exec changeset version
+          publish: pnpm exec changeset publish
+          commit: ":bookmark: ci(release): npm packages release"
+          title: ":bookmark: ci(release): npm packages release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm (snapshot)
+        id: changesets-develop
+        uses: changesets/action@v1
+        with:
+          version: pnpm exec changeset version --snapshot
+          publish: pnpm exec changeset publish
+          commit: ":construction: ci(release): npm packages release"
+          title: ":construction: ci(release): npm packages release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
