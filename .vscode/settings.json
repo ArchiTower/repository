@@ -13,6 +13,13 @@
     "yaml",
     "html"
   ],
+  "eslint.workingDirectories": [
+    { "pattern": "./demo/*/" },
+    { "pattern": "./docs/" },
+    { "pattern": "./packages/*/" }
+  ],
+  "eslint.packageManager": "pnpm",
+  "eslint.run": "onType",
   "editor.codeActionsOnSave": {},
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
