@@ -2,10 +2,10 @@
   "name": "docs",
   "private": true,
   "dependencies": {
-    "vitepress": "1.0.0-beta.1"
+    "vitepress": "1.0.0-beta.3"
   },
   "devDependencies": {
-    "eslint": "8.42.0"
+    "eslint": "8.43.0"
   },
   "scripts": {
     "dev": "vitepress dev",
