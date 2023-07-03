@@ -7,7 +7,7 @@ export function observerFactory<
 >(
   config: {
     actions?: TActions
-    dataAccessor?: TDataAccessor
+    dataAccessor?: () => TDataAccessor
   } = {}
 ) {
   const internal = new Observatory(config)
@@ -18,23 +18,3 @@ export function observerFactory<
     observe: internal.observe.bind(internal),
   }
 }
-
-const test1 = observerFactory({
-  //  ^?
-  actions: ["action1", "action2"],
-})
-
-test1.observe({
-  //   ^?
-  action1: () => {},
-  action2: () => {},
-})
-test1.trigger("action1")
-//     ^?
-
-const test2 = observerFactory()
-//     ^?
-test2.observe(() => {})
-//        ^?
-test2.trigger()
-//     ^?
