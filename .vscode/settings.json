@@ -13,6 +13,12 @@
     "yaml",
     "html"
   ],
+  "eslint.workingDirectories": [
+    { "pattern": "./demo/*/" },
+    { "pattern": "./docs/" },
+    { "pattern": "./packages/*/" }
+  ],
+  "eslint.run": "onType",
   "editor.codeActionsOnSave": {},
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -24,5 +30,9 @@
   },
   "[markdown]": {
     "editor.formatOnSave": false
-  }
+  },
+  "[json]": {
+    "editor.formatOnSave": false
+  },
+  "vitest.commandLine": "vitest"
 }
