@@ -107,39 +107,40 @@ describe("ObserverFactory", () => {
       expect(counter.value).toBe(1)
     })
 
-    it.todo(
-      "Given callback with idle option, When trigger, Then run when browser is idle",
-      () => {
-        const { trigger, observe } = observerFactory({
-          actions: ["action-idle"],
-        })
-        const callback = vi.fn()
+    it("Given callback with idle option, When trigger, Then run when browser is idle", () => {
+      vi.stubGlobal("requestIdleCallback", (callback: () => void) => {
+        callback()
+      })
 
-        observe({ action: "action-idle", observer: callback, idle: true })
-        trigger("action-idle")
+      const { trigger, observe } = observerFactory({
+        actions: ["action-idle"],
+      })
+      const callback = vi.fn()
 
-        expect(callback).toBeCalledTimes(1)
-      }
-    )
+      observe({ action: "action-idle", observer: callback, idle: true })
+      trigger("action-idle")
 
-    it.todo(
-      "Given callback with idle option on non-supported browser, When trigger, Then run after 2000ms",
-      () => {
-        const { trigger, observe } = observerFactory({
-          actions: ["action-idle"],
-        })
-        const callback = vi.fn()
+      expect(callback).toBeCalledTimes(1)
+    })
 
-        observe({ action: "action-idle", observer: callback, idle: true })
-        trigger("action-idle")
+    it("Given callback with idle option on non-supported browser, When trigger, Then run after 2000ms", () => {
+      vi.useFakeTimers()
+      // eslint-disable-next-line unicorn/no-useless-undefined
+      vi.stubGlobal("requestIdleCallback", undefined)
+      const { trigger, observe } = observerFactory({
+        actions: ["action-idle"],
+      })
+      const callback = vi.fn()
 
-        expect(callback).toBeCalledTimes(0)
+      observe({ action: "action-idle", observer: callback, idle: true })
+      trigger("action-idle")
 
-        vi.advanceTimersByTime(2000)
+      expect(callback).toBeCalledTimes(0)
 
-        expect(callback).toBeCalledTimes(1)
-      }
-    )
+      vi.advanceTimersByTime(2000)
+
+      expect(callback).toBeCalledTimes(1)
+    })
 
     it("Given data access function, When callback triggered, Then callback has access to data", () => {
       const { trigger, observe } = observerFactory({
